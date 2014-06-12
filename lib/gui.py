@@ -124,11 +124,24 @@ class App(object):
             print direction == "R"
 
             if direction == "R":
+                print "Inside direction == R"
                 if dom // 10 == rightEnd:
+                    print "Inside direction == R, dom // 10 == rightEnd"
                     self.playerTurn(position = True, index = int(self.domValue.get()), placement = "R")
                 elif dom % 10 == rightEnd:
+                    print "Inside direction == R, dom % 10 == rightEnd"
                     self.flip(int(self.domValue.get()))
                     self.playerTurn(position = True, index = int(self.domValue.get()), placement = "L")
+            elif direction == "L":
+                print "Inside direction == L"
+                if dom // 10 == rightEnd:
+                    print "Inside direction == L, dom // 10 == rightEnd"
+                    self.flip(int(self.domValue.get()))
+                    self.playerTurn(position = True, index = int(self.domValue.get()), placement = "R")
+                elif dom % 10 == rightEnd:
+                    print "Inside direction == L, dom % 10 == rightEnd"
+                    self.playerTurn(position = True, index = int(self.domValue.get()), placement = "L")
+            
             
             
 
