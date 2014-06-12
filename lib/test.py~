@@ -1,0 +1,18 @@
+
+
+from Tkinter import *
+import hand
+import domino
+
+root = Tk()
+canvas = Canvas(root, width = 400, height = 200)
+canvas.pack()
+a = [domino.Domino(), domino.Domino()]
+print a
+# for i in xrange(1, len(a) + 1):
+#     a[i-1].displayValue(canvas, x = i* 60, y = 10, orientation = "H")
+ #a.displayValue(canvas, 30, 10, orientation = "H")
+b = hand.Hand(a)
+b.displayHand(30, 10, canvas, orientation = "H")
+root.mainloop()
+
