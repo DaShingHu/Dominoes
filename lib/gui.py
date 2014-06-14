@@ -73,31 +73,123 @@ class App(object):
         rightEnd = int(self.game.table.getEnds()[1])
         domino = int(self.game.pHand.dominoes[self.clickedDomino].returnValue())
 
-        print domino, leftEnd, rightEnd
         print event.x, event.y
 
-        print int(event.x) >= 100
-        print int(event.x) <= 160
-        print int(event.y) >= 100
-        print int(event.y) <= 160
+        rightDom = self.game.table.getCurrRight(600)
+        direction = str(rightDom[-1])
+        #### This istop right hand corner of the current domino
+        rightDom = (int(rightDom[0]) + 60, int(rightDom[1]))
+        
+        print rightDom
+        print direction
 
-        if int(event.x) >= 100 and int(event.x) <= 160 and int(event.y) >= 100 and int(event.y) <= 160:
-            print "hi"
-            try:
-                if domino % 10 == leftEnd:
-                    self.game.playerTurn(position = True, index = self.clickedDomino, placement = "L")
-                    self.updateTable()
-                    self.playable = False
-                    self.btnPlayerTurn.config(state = DISABLED)
+        if self.playable == True:
+            if int(event.x) >= 100 and int(event.x) <= 160 and int(event.y) >= 130 and int(event.y) <= 160:
+                try:
+                    if domino % 10 == leftEnd:
+                        self.game.playerTurn(position = True, index = self.clickedDomino, placement = "L")
+                        self.updateTable()
+                        self.playable = False
+                        self.btnPlayerTurn.config(state = DISABLED)
                     
-                elif domino // 10 == leftEnd:
-                    self.flip(self.clickedDomino)
-                    self.game.playerTurn(position = True, index = self.clickedDomino, placement = "L")
-                    self.updateTable()
-                    self.playable = False
-                    self.btnPlayerTurn.config(state = DISABLED)
-            except DominoError:
-                tkMessageBox.showinfo("Invalid move", "THat is an invalid move!")
+                    elif domino // 10 == leftEnd:
+                        self.flip(self.clickedDomino)
+                        self.game.playerTurn(position = True, index = self.clickedDomino, placement = "L")
+                        self.updateTable()
+                        self.playable = False
+                        self.btnPlayerTurn.config(state = DISABLED)
+                except DominoError:
+                    tkMessageBox.showinfo("Invalid move", "THat is an invalid move!")
+                    
+            else:
+                if direction == "R":
+                    if int(event.x) >= int(rightDom[0]- 90) and int(event.x) <= int(rightDom[0]) and int(event.y) >= int(rightDom[1]) and int(event.y) <= int(rightDom[1] + 30):
+                        try:
+                            if domino // 10 == rightEnd:
+                                self.game.playerTurn(position = True, index = self.clickedDomino, placement = "R")
+                                self.updateTable()
+                                self.playable = False
+                                self.btnPlayerTurn.config(state = DISABLED)
+
+                            elif domino % 10 == rightEnd:
+                                self.flip(self.clickedDomino)
+                                self.game.playerTurn(position = True, index = self.clickedDomino, placement = "R")
+                                self.updateTable()
+                                self.playable = False
+                                self.btnPlayerTurn.config(state = DISABLED)
+                        except DominoError:
+                            tkMessageBox.showinfo("Invalid move", "THat is an invalid move!")
+                            
+                elif direction == "DR":
+                    if int(event.x) >= int(rightDom[0] - 60) and int(event.x) <= int(rightDom[0] + 60) and int(event.y) >= int(rightDom[1] - 30) and int(event.y) <= int(rightDom[1] + 90):
+                        try:
+                            if domino // 10 == rightEnd:
+                                self.game.playerTurn(position = True, index = self.clickedDomino, placement = "R")
+                                self.updateTable()
+                                self.playable = False
+                                self.btnPlayerTurn.config(state = DISABLED)
+
+                            elif domino % 10 == rightEnd:
+                                self.flip(self.clickedDomino)
+                                self.game.playerTurn(position = True, index = self.clickedDomino, placement = "R")
+                                self.updateTable()
+                                self.playable = False
+                                self.btnPlayerTurn.config(state = DISABLED)
+                        except DominoError:
+                            tkMessageBox.showinfo("Invalid move", "THat is an invalid move!")
+                                
+                    #### Move towards the left
+                elif direction == "L":
+                    if int(event.x) >= int(rightDom[0] - 60) and int(event.x) <= int(rightDom[0] + 60) and int(event.y) >= int(rightDom[1]) and int(event.y) <= int(rightDom[1] + 60):
+                        try:
+                            if domino // 10 == rightEnd:
+                                self.game.playerTurn(position = True, index = self.clickedDomino, placement = "R")
+                                self.updateTable()
+                                self.playable = False
+                                self.btnPlayerTurn.config(state = DISABLED)
+
+                            elif domino % 10 == rightEnd:
+                                self.flip(self.clickedDomino)
+                                self.game.playerTurn(position = True, index = self.clickedDomino, placement = "R")
+                                self.updateTable()
+                                self.playable = False
+                                self.btnPlayerTurn.config(state = DISABLED)
+                        except DominoError:
+                            tkMessageBox.showinfo("Invalid move", "THat is an invalid move!")
+
+                elif direction == "DL":
+                    print "Hi"
+                    print int(event.x) >= int(rightDom[0] - 120)
+                    print int(event.x) <= int(rightDom[0] + 120)
+                    print int(event.y) >= int(rightDom[1] - 60)
+                    print int(event.y) <= int(rightDom[1] + 60)
+                    if int(event.x) >= int(rightDom[0] - 120) and int(event.x) <= int(rightDom[0] + 120) and int(event.y) >= int(rightDom[1] - 60) and int(event.y) <= int(rightDom[1] + 60):
+                        print "In"
+                        try:
+                            if domino // 10 == rightEnd:
+                                self.game.playerTurn(position = True, index = self.clickedDomino, placement = "R")
+                                self.updateTable()
+                                self.playable = False
+                                self.btnPlayerTurn.config(state = DISABLED)
+
+                            elif domino % 10 == rightEnd:
+                                self.flip(self.clickedDomino)
+                                self.game.playerTurn(position = True, index = self.clickedDomino, placement = "R")
+                                self.updateTable()
+                                self.playable = False
+                                self.btnPlayerTurn.config(state = DISABLED)
+                        except DominoError:
+                            tkMessageBox.showinfo("Invalid move", "THat is an invalid move!")
+                                
+                                                                                                                               
+                        
+                    
+
+                                                                                                                               
+                                                                                                                              
+                                                                                                                              
+                
+                    
 
         
 
@@ -202,6 +294,8 @@ class App(object):
         ### Input: Name of player that own
         ### Output: None
         tkMessageBox.showinfo("Game Over!", "Congratulations, %s won, with a score of %i!" %( playerName, score))
+        self.playable = False
+
         
 
     def cpuPlay(self):
@@ -242,10 +336,11 @@ class App(object):
                 self.endGame("Computer 3", self.game.calcScore(self.game.c1Hand, self.game.c2Hand, self.game.pHand))
                 self.btnPlayerTurn.config(state = DISABLED)
 
-
+                
         if done == False:
             self.btnPlayerTurn.config(state = NORMAL)
             self.btnEndTurn.config(state = NORMAL)
+            self.playable = True
 #            self.checkPlayable()
         
 
