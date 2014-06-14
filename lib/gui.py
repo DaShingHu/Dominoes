@@ -2,6 +2,7 @@
 ### Date: 04-06-2014
 ### Purpose: To be the GUI for the domino game
 
+from dominogame import DominoError
 import dominogame
 import hand
 import time
@@ -29,9 +30,17 @@ class App(object):
     ####### dirVar: The direction in which the player wishes to move
     ####### dirGroup: THe frame for directino
     ####### btnPlayerTurn: The player's turn button
+    ####### btnEndTurn: The end turn button
     ####### vcmd: Validation comand
+    ####### clickedDomino: The domino that the player clicked on
+    ####### playable: Whetehr or not the player can play
 
     ### Methods:
+    ####### getCoords: Gets the coordinates of the mouse
+    ####### genCoords: Generates the coordinates for the dominoes
+    ####### getAbout: Gets the about
+    ####### getHelp: Gets the help
+    ####### checkPlayable: Checks whether or not the player can play
     ####### validate: Validates input
     ####### endGame: Ends the game
     ####### cpuPlay: Runs the computer's turn
@@ -49,10 +58,134 @@ class App(object):
     ####### initRoot: Initalizes the root
     ####### __init__: Initalizes the thing
 
+    def clickMove(self, event):
+        ### Author: DUstin Hu
+        ### DAte: 13-06-2014
+        ### Purpose: To allow the player to click and move
+        ### Input: None
+        ### Output: None
+        if event.y >= 10 and event.y <= 40:
+            self.clickedDomino = self.getCoords(event)
+            
+
+
+        leftEnd = int(self.game.table.getEnds()[0])
+        rightEnd = int(self.game.table.getEnds()[1])
+        domino = int(self.game.pHand.dominoes[self.clickedDomino].returnValue())
+
+        print domino, leftEnd, rightEnd
+        print event.x, event.y
+
+        print int(event.x) >= 100
+        print int(event.x) <= 160
+        print int(event.y) >= 100
+        print int(event.y) <= 160
+
+        if int(event.x) >= 100 and int(event.x) <= 160 and int(event.y) >= 100 and int(event.y) <= 160:
+            print "hi"
+            try:
+                if domino % 10 == leftEnd:
+                    self.game.playerTurn(position = True, index = self.clickedDomino, placement = "L")
+                    self.updateTable()
+                    self.playable = False
+                    self.btnPlayerTurn.config(state = DISABLED)
+                    
+                elif domino // 10 == leftEnd:
+                    self.flip(self.clickedDomino)
+                    self.game.playerTurn(position = True, index = self.clickedDomino, placement = "L")
+                    self.updateTable()
+                    self.playable = False
+                    self.btnPlayerTurn.config(state = DISABLED)
+            except DominoError:
+                tkMessageBox.showinfo("Invalid move", "THat is an invalid move!")
+
+        
+
+        
+    def getCoords(self, event):
+        ### Author: Dustin Hu
+        ### DAte: 13-06-2014
+        ### Purpose: To get the coordinates at which the user clicks
+        ### Input: THe coordiantes from the player
+        ### Output: None
+        possibleMoves = self.genCoords()
+        domino = 0
+        for i in xrange(0, len(possibleMoves)):
+            moves = possibleMoves[i]
+            minX = int(moves[0])
+            maxX = int(moves[1])
+            if int(event.x) >= minX and int(event.x) <= maxX:
+                domino = i
+        return domino
+
+        
+
+    def genCoords(self):
+        ### Author: Dustin Hu
+        ### Date: 13-06-2014
+        ### Purpose: To generate a lit of coordinates for the drag and drop
+        ### Input: None
+        ### Output: None
+        topLeft = 80
+        bottomRight = 170
+        clickCoords = []
+        for i in xrange(0, len(self.game.pHand.dominoes)):
+            clickCoords.append((topLeft, bottomRight))
+            topLeft = topLeft + 80
+            bottomRight = bottomRight + 80
+        return clickCoords
+        
+        
+
+    def getAbout(self):
+        ### Author: DUstin Hu
+        ### DAte: 13-06-2014
+        ### Purpoes: To get the About information
+        ### Input: None
+        ### Output: None
+        tkMessageBox.showinfo("About", "Author: Dustin Hu\nDate:08-06-2014 to 15-06-2014\nTeacher: Don Smith")
+
+    def getHelp(self):
+        ### Author: DUstin Hu
+        ### DAet: 13-06-2014
+        ### Purpose: To get help
+        ### Input: None
+        ### Output: None
+        tkMessageBox.showinfo("Help", "Hit the start game button to start the game.\nType in the domino number that you wish to play, counting from 0 at the far left of your hand and select which end of the chain you want to play it on (If the chain has turned, the lower one is the right). Hit the play button to play it, and the End Turn button to end your turn. However, if it's possible for you to play a domino, the End Turn button will not be enabled until you've played a card!")
+
+
+    def checkPlayable(self):
+        ### AUthor: Dustin Hu
+        ### Date: 13-06-2014
+        ### Purpose: To cehck if the user has any playable dominoes
+        ### Input: None
+        ### Output: None
+
+        playable = []
+        leftEnd = int(self.game.table.getEnds()[0])
+        rightEnd = int(self.game.table.getEnds()[1])
+        
+        for domino in self.game.pHand.dominoes:
+            dom = int(domino.value)
+
+            if dom % 10 == rightEnd:
+                playable.append((domino, "R"))
+            elif dom // 10 == leftEnd:
+                playable.append((domino, "L"))
+
+        if len(playable) != 0:
+            self.btnPlayerTurn.config(state = NORMAL)
+        else:
+            self.cpuPlay()
+
     
     def validate(self, action, index, value_if_allowed,
                  prior_value, text, validation_type, trigger_type, widget_name):
-        if text in "01234567":
+        words = ""
+        for i in xrange(0, len(self.game.pHand.dominoes) ):
+            words = words + str(i)
+                        
+        if text in words:
             try:
                 float(value_if_allowed)
                 return True
@@ -77,26 +210,43 @@ class App(object):
         ### Purpose: To allow the computer to play
         ### Input: None
         ### Output: None
+        
+        done = False
+        
+        self.btnEndTurn.config(state = DISABLED)
         self.game.cpuTurn(self.game.c1Hand)
-#        time.sleep(random.randint(0, 6))
+
+#### Insert sleep        
         self.updateTable()
         if len(self.game.c1Hand.dominoes) == 0:
             self.endGame("Computer 1", self.game.calcScore(self.game.c2Hand, self.game.c3Hand, self.game.pHand))
-            
-        self.game.cpuTurn(self.game.c2Hand)
-#        time.sleep(random.randint(0, 6))
-        self.updateTable()
-        if len(self.game.c2Hand.dominoes) == 0:
-            self.endGame("Computer 2", self.game.calcScore(self.game.c1Hand, self.game.c3Hand, self.game.pHand))
-        
-        self.game.cpuTurn(self.game.c3Hand)
-#        time.sleep(random.randint(0, 6))
-        self.updateTable()
-        if len(self.game.c3Hand.dominoes) == 0:
-            self.endGame("Computer 3", self.game.calcScore(self.game.c1Hand, self.game.c2Hand, self.game.pHand))
+            self.btnPlayerTurn.config(state = DISABLED)
+            done = True
 
-        self.btnPlayerTurn.config(state = NORMAL)
-                   
+        if done == False:
+            self.game.cpuTurn(self.game.c2Hand)
+#### Insert sleep
+
+            self.updateTable()
+            if len(self.game.c2Hand.dominoes) == 0:
+                self.endGame("Computer 2", self.game.calcScore(self.game.c1Hand, self.game.c3Hand, self.game.pHand))
+                self.btnPlayerTurn.config(state = DISABLED)                
+                done = True
+
+                
+        if done == False:
+            self.game.cpuTurn(self.game.c3Hand)
+#### Insert sleep            
+            self.updateTable()
+            if len(self.game.c3Hand.dominoes) == 0:
+                self.endGame("Computer 3", self.game.calcScore(self.game.c1Hand, self.game.c2Hand, self.game.pHand))
+                self.btnPlayerTurn.config(state = DISABLED)
+
+
+        if done == False:
+            self.btnPlayerTurn.config(state = NORMAL)
+            self.btnEndTurn.config(state = NORMAL)
+#            self.checkPlayable()
         
 
     def playerTurn(self):
@@ -115,39 +265,51 @@ class App(object):
         direction = self.dirVar.get()
         
         try:
-            print domino // 10, leftEnd, domino // 10 == leftEnd
-            print domino % 10, leftEnd, domino % 10 == leftEnd
-            print domino // 10, rightEnd, domino // 10 == rightEnd
-            print domino % 10, rightEnd, domino % 10 == rightEnd
-            print direction, type(direction)
-            print direction == "L"
-            print direction == "R"
+            # print domino // 10, leftEnd, domino // 10 == leftEnd
+            # print domino % 10, leftEnd, domino % 10 == leftEnd
+            # print domino // 10, rightEnd, domino // 10 == rightEnd
+            # print domino % 10, rightEnd, domino % 10 == rightEnd
+            # print direction, type(direction)
+            # print direction == "L"
+            # print direction == "R"
 
             if direction == "R":
-                print "Inside direction == R"
-                if dom // 10 == rightEnd:
-                    print "Inside direction == R, dom // 10 == rightEnd"
-                    self.playerTurn(position = True, index = int(self.domValue.get()), placement = "R")
-                elif dom % 10 == rightEnd:
-                    print "Inside direction == R, dom % 10 == rightEnd"
+                if domino // 10 == rightEnd:
+                    self.game.playerTurn(position = True, index = int(self.domValue.get()), placement = "R")
+                    self.updateTable()
+                    self.btnPlayerTurn.config(state = DISABLED)
+                    self.playable = False
+                    self.btnEndTurn.config(state = NORMAL)
+                elif domino % 10 == rightEnd:
                     self.flip(int(self.domValue.get()))
-                    self.playerTurn(position = True, index = int(self.domValue.get()), placement = "L")
+                    self.game.playerTurn(position = True, index = int(self.domValue.get()), placement = "R")
+                    self.updateTable()
+                    self.btnPlayerTurn.config(state = DISABLED)
+                    self.playable = False
+                    self.btnEndTurn.config(state = NORMAL)                    
             elif direction == "L":
-                print "Inside direction == L"
-                if dom // 10 == rightEnd:
-                    print "Inside direction == L, dom // 10 == rightEnd"
+                if domino // 10 == leftEnd:
                     self.flip(int(self.domValue.get()))
-                    self.playerTurn(position = True, index = int(self.domValue.get()), placement = "R")
-                elif dom % 10 == rightEnd:
-                    print "Inside direction == L, dom % 10 == rightEnd"
-                    self.playerTurn(position = True, index = int(self.domValue.get()), placement = "L")
-            
-            
-            
+                    self.game.playerTurn(position = True, index = int(self.domValue.get()), placement = "L")
+                    self.updateTable()
+                    self.btnPlayerTurn.config(state = DISABLED)
+                    self.playable = False
+                    self.btnEndTurn.config(state = NORMAL)                    
+                elif domino % 10 == leftEnd:
+                    self.game.playerTurn(position = True, index = int(self.domValue.get()), placement = "L")
+                    self.updateTable()
+                    self.btnPlayerTurn.config(state = DISABLED)
+                    self.playable = False
+                    self.btnEndTurn.config(state = NORMAL)
+                    
+            if len(self.game.pHand.dominoes) == 0:
+                self.endGame("Player", self.game.calcScore(self.game.c1Hand, self.game.c2Hand, self.game.c3Hand))
 
+            self.domValue.set("0")
+
+                
                     
-                    
-        except NameError:
+        except DominoError:
             tkMessageBox.showinfo("Invalid move", "That is an invalid move!")
 
         # print domino
@@ -212,9 +374,9 @@ class App(object):
         try:
             self.game.pHand.dominoes[int(i)].flip()
             self.updateTable()
-            print "flipped"
         except (TypeError, ValueError, IndexError):
-            tkMessageBox.showinfo("Invalid Input", "Please enter a valid integer between 1 and %s" % str(len(self.game.pHand.dominoes)))
+            pass
+#            tkMessageBox.showinfo("Invalid Input", "Please enter a valid integer between 1 and %s" % str(len(self.game.pHand.dominoes)))
             
 
 
@@ -240,12 +402,12 @@ class App(object):
         ### Input: None
         ### Output: None
         self.canvas.delete(ALL)
+        self.canvas.create_rectangle(100, 100, 600, 600, outline = "black", fill = "lawn green")
         self.game.pHand.displayHand(30, 10, self.canvas, orientation = "H")
-        self.game.c1Hand.displayHand(30, 30, self.canvas, orientation = "V")
-        self.game.c2Hand.displayHand(650, 30, self.canvas, orientation = "V")
-        self.game.c3Hand.displayHand(30, 650, self.canvas, orientation = "H")
-        self.TCanvas.delete(ALL)
-        self.game.table.drawTable(500, self.TCanvas)
+        self.game.c1Hand.displayHand(30, 30, self.canvas, orientation = "V", faceup = False)
+        self.game.c2Hand.displayHand(650, 30, self.canvas, orientation = "V", faceup = False)
+        self.game.c3Hand.displayHand(30, 650, self.canvas, orientation = "H", faceup = False)
+        self.game.table.drawTable(600, self.canvas)
 
     def startGame(self):
         ### Author: Dustin Hu
@@ -254,8 +416,35 @@ class App(object):
         ### Input: None
         ### Output: None
         self.game.startGame()
+        
+        if len(self.game.pHand.dominoes) == 6:
+            self.cpuPlay()
+            
+        elif len(self.game.c1Hand.dominoes) == 6:
+            self.game.cpuTurn(self.game.c2Hand)
+            ### Insert pause here
+            self.updateTable()
+
+            self.game.cpuTurn(self.game.c3Hand)
+            ### Inesrt pause here
+            self.updateTable()
+            
+            self.btnPlayerTurn.config(state = NORMAL)
+
+        elif len(self.game.c2Hand.dominoes) == 6:
+            self.game.cpuTurn(self.game.c3Hand)
+            self.updateTable()
+            self.btnPlayerTurn.config(state = NORMAL)
+
+        elif len(self.game.c3Hand.dominoes) == 6:
+            self.btnPlayerTurn.config(state = NORMAL)
+            
+            
         self.updateTable()
+#        self.checkPlayable()
         self.btnStart.config(state = DISABLED)
+        self.btnEndTurn.config(state = NORMAL)
+        self.playable = True
 
     def cpuTurn(self, hand):
         self.game.cpuTurn(hand)
@@ -269,10 +458,11 @@ class App(object):
         ### Input: None
         ### Output: None
 
-        Button(self.root, text = "End turn", command = lambda:self.cpuPlay()).place(x = 750, y = 200)
+        self.btnEndTurn = Button(self.root, text = "End turn", state = DISABLED, command = lambda:self.cpuPlay())#.place(x = 750, y = 200)
+        self.btnEndTurn.place(x = 750, y = 200)
         self.btnStart = Button(self.root, text = "Start Game", command = lambda:self.startGame())
         self.btnStart.place(x = 750, y = 25)
-        self.btnPlayerTurn = Button(self.root, text = "Play", command = lambda:self.playerTurn())
+        self.btnPlayerTurn = Button(self.root, text = "Play", state = DISABLED,  command = lambda:self.playerTurn())
         self.btnPlayerTurn.place(x = 725, y = 100)
 #        Button(self.root, text = "Flip", command = lambda:self.flip(self.domNum.get()) ).place(x = 775, y = 100)
         #.(x = 775, y = 100)
@@ -292,12 +482,12 @@ class App(object):
         ### Purpsoe: To initalize the labels in this game
         ### Input: None
         ### Output: None
-        Label(self.root, text = "Player", background = "green").place(x = 325, y = 75)
-        Label(self.root, text = "CPU 1", background = "green").place(x = 55, y = 300)
+        Label(self.root, text = "Player", background = "green", fg = "yellow").place(x = 325, y = 75)
+        Label(self.root, text = "CPU 1", background = "green", fg = "yellow").place(x = 55, y = 300)
 
-        Label(self.root, text = "CPU 2", background = "green").place(x = 325, y = 610)
+        Label(self.root, text = "CPU 3", background = "green", fg = "yellow").place(x = 325, y = 610)
 #        Label(self.root, text = "CPU2", background = "green").place(x = 60, y = 300)
-        Label(self.root, text = "CPU3", background = "green").place(x = 610, y = 300)
+        Label(self.root, text = "CPU2", background = "green", fg = "yellow").place(x = 610, y = 300)
 
 
         Label(self.root, text = "Flip Domino:").place(x = 725, y = 75)
@@ -310,9 +500,10 @@ class App(object):
         ### Purpsoe: To initalize the table of the game
         ### Input: None
         ### Output: None
-        self.TCanvas = Canvas(self.root, width = 500, height = 500)
-        self.TCanvas.place(x= 100, y = 100)
-        self.TCanvas.config(background = "lawn green")
+        self.canvas.create_rectangle(100, 100, 600, 600, outline = "black", fill = "lawn green")
+        # self.TCanvas = Canvas(self.root, width = 500, height = 500)
+        # self.TCanvas.place(x= 100, y = 100)
+        # self.TCanvas.config(background = "lawn green")
 
     def initGame(self):
         ### Author: Dustin Hu
@@ -321,10 +512,10 @@ class App(object):
         ### Input: None
         ### Output: None
         self.game = dominogame.DominoGame()
-        self.game.pHand.displayHand(30, 10, self.canvas, orientation = "H")
-        self.game.c1Hand.displayHand(30, 30, self.canvas, orientation = "V")
-        self.game.c2Hand.displayHand(650, 30, self.canvas, orientation = "V")
-        self.game.c3Hand.displayHand(30, 650, self.canvas, orientation = "H")
+        self.game.pHand.displayHand(30, 10, self.canvas, orientation = "H" )
+        self.game.c1Hand.displayHand(30, 30, self.canvas, orientation = "V", faceup = False)
+        self.game.c2Hand.displayHand(650, 30, self.canvas, orientation = "V", faceup = False)
+        self.game.c3Hand.displayHand(30, 650, self.canvas, orientation = "H", faceup = False)
         self.initTable()
 
 
@@ -339,6 +530,7 @@ class App(object):
         self.canvas.place(x = 0, y = 0)
         self.canvas.config(background = "green")
         self.initTable()
+        self.canvas.bind("<Button-1>", self.clickMove)
 
         
     def initRoot(self):
@@ -356,7 +548,14 @@ class App(object):
         
         self.filemenu = Menu(self.menubar, tearoff = 0)
         self.filemenu.add_command(label = "Exit", command = lambda:self.root.destroy())
+
         self.menubar.add_cascade(label = "File", menu = self.filemenu)
+
+        self.helpMenu = Menu(self.menubar, tearoff = 0)
+        self.helpMenu.add_command(label = "Help", command = lambda:self.getHelp())
+        self.helpMenu.add_command(label = "About", command = lambda:self.getAbout())
+
+        self.menubar.add_cascade(label = "Help", menu = self.helpMenu)
 
 
         self.root.config(menu = self.menubar)
@@ -381,6 +580,8 @@ class App(object):
         self.initButtons()
         self.initInput()
         self.initFrame()
+        self.playable = False
+        self.clickedDomino = 0
 #        Entry(self.root, width = 2, textvariable = self.domValue, justify = RIGHT, validate = 'key', validatecommand = vcmd).place(x = 850, y = 75)
 
         self.root.mainloop()
