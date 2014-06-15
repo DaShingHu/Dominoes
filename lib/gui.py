@@ -36,8 +36,11 @@ class App(object):
     ####### clickedDomino: The domino that the player clicked on
     ####### playable: Whetehr or not the player can play
     ####### played: wehtehr or not a move has been done. If this reaches a threshold, it will end in a tie.
-
+    ####### btnReset: Resets the game
+    
     ### Methods:
+    ####### resetGame: Resets the game
+    ####### endTie: Ends a tiegame/stalemate
     ####### showScoe: Shows the score
     ####### saveScore: Saves scores 
     ####### getCoords: Gets the coordinates of the mouse
@@ -61,6 +64,29 @@ class App(object):
     ####### initCanvas: Initalizes the canvas
     ####### initRoot: Initalizes the root
     ####### __init__: Initalizes the thing
+
+    def resetGame(self):
+        ### Author: DUstin Hu
+        ### DAte: 15-06-2014
+        ### Purpose: To reset the game
+        ### Input: None
+        ### Output: None
+        self.canvas.delete(ALL)
+        self.initGame()
+        
+
+    def endTie(self):
+        ### Author: DUstin Hu
+        ### Date: 15-06-2014
+        ### Purpose: To end a stalement
+        ### Input: None
+        ### Output: None
+        tkMessageBox.showinfo("Tie Game", "The game is a tie!")
+        self.playable = False
+        self.btnEndTurn.config(state = DISABLED)
+        self.btnPlayerTurn.config(state = DISABLED)
+        self.btnReset.config(state = NORMAL)
+
 
     def showScore(self):
         ### Author: Dustin hu
@@ -147,6 +173,7 @@ class App(object):
         ### Purpose: To allow the player to click and move
         ### Input: None
         ### Output: None
+        
         if event.y >= 10 and event.y <= 60:
             self.clickedDomino = self.getCoords(event)
 
@@ -157,6 +184,7 @@ class App(object):
 
 
         domino = int(self.game.pHand.dominoes[self.clickedDomino - 1].returnValue())
+
 
 
         rightDom = self.game.table.getCurrRight(600)
@@ -177,7 +205,7 @@ class App(object):
                     
                     elif domino // 10 == leftEnd:
                         self.flip(self.clickedDomino -1 )
-                        self.game.playerTurn(position = True, index = self.clickedDomino, placement = "L")
+                        self.game.playerTurn(position = True, index = self.clickedDomino - 1, placement = "L")
                         self.updateTable()
                         self.playable = False
                         self.btnPlayerTurn.config(state = DISABLED)
@@ -377,10 +405,12 @@ class App(object):
         elif playerName == "Player":
             player = 3
 
-            
         self.saveScore(player, score)
-        
-
+        self.btnReset.config(state = NORMAL)
+        self.playable = False
+        self.played = 0
+        self.btnEndTurn.config(state = DISABLED)
+        self.btnPlayerTurn.config(state = DISABLED)
         
 
     def cpuPlay(self):
@@ -397,6 +427,8 @@ class App(object):
         newLength = len(self.game.c1Hand.dominoes)
         if oriLength == newLength:
             self.played = self.played + 1
+        else:
+            self.played = 0
 
 
 #### Insert sleep        
@@ -407,8 +439,14 @@ class App(object):
             done = True
 
         if done == False:
-            
+            oriLength = len(self.game.c2Hand.dominoes)
             self.game.cpuTurn(self.game.c2Hand)
+            newLength = len(self.game.c2Hand.dominoes)
+            if oriLength == newLength:
+                self.played = self.played + 1
+            else:
+                self.played = 0
+                        
 #### Insert sleep
 
             self.updateTable()
@@ -419,7 +457,13 @@ class App(object):
 
                 
         if done == False:
+            oriLength = len(self.game.c3Hand.dominoes)
             self.game.cpuTurn(self.game.c3Hand)
+            newLength = len(self.game.c3Hand.dominoes)
+            if oriLength == newLength:
+                self.played = self.played + 1
+            else:
+                self.played = 0
 #### Insert sleep            
             self.updateTable()
             if len(self.game.c3Hand.dominoes) == 0:
@@ -431,7 +475,10 @@ class App(object):
             self.btnPlayerTurn.config(state = NORMAL)
             self.btnEndTurn.config(state = NORMAL)
             self.playable = True
+            if self.played >= 4:
+                self.endTie()
 #            self.checkPlayable()
+
         
 
     def playerTurn(self):
@@ -440,6 +487,7 @@ class App(object):
         ### Purpose: To call and setup the players turn
         ### Input: None
         ### Output: None
+        oriLength = len(self.game.pHand)
         try:
             domino = int(self.game.pHand.dominoes[int(self.domValue.get())].returnValue())
         except IndexError:
@@ -496,6 +544,13 @@ class App(object):
                     
         except DominoError:
             tkMessageBox.showinfo("Invalid move", "That is an invalid move!")
+
+        newLength = len(self.game.pHand.dominoes)
+
+        if newLength == oriLength:
+            self.played = self.played + 1
+        else:
+            self.played = 0
 
         # print domino
         # print leftEnd
@@ -629,6 +684,7 @@ class App(object):
 #        self.checkPlayable()
         self.btnStart.config(state = DISABLED)
         self.btnEndTurn.config(state = NORMAL)
+        self.btnPlayerTurn.config(state = NORMAL)
         self.playable = True
 
     def cpuTurn(self, hand):
@@ -642,11 +698,12 @@ class App(object):
         ### Purpose: To initalize the buttons
         ### Input: None
         ### Output: None
-
+        self.btnReset = Button(self.root, text = "Reset Game", state = DISABLED, command = lambda:self.resetGame())
+        self.btnReset.place(x = 750, y = 250)
         self.btnEndTurn = Button(self.root, text = "End turn", state = DISABLED, command = lambda:self.cpuPlay())#.place(x = 800, y = 200)
-        self.btnEndTurn.place(x = 800, y = 200)
+        self.btnEndTurn.place(x = 750, y = 200)
         self.btnStart = Button(self.root, text = "Start Game", command = lambda:self.startGame())
-        self.btnStart.place(x = 775, y = 25)
+        self.btnStart.place(x = 750, y = 25)
         self.btnPlayerTurn = Button(self.root, text = "Play", state = DISABLED,  command = lambda:self.playerTurn())
         self.btnPlayerTurn.place(x = 750, y = 100)
 #        Button(self.root, text = "Flip", command = lambda:self.flip(self.domNum.get()) ).place(x = 775, y = 100)
@@ -768,7 +825,7 @@ class App(object):
         self.initFrame()
         self.played = 0
         self.playable = False
-        self.clickedDomino = 0
+        self.clickedDomino = -1
 #        Entry(self.root, width = 2, textvariable = self.domValue, justify = RIGHT, validate = 'key', validatecommand = vcmd).place(x = 850, y = 75)
 
         self.root.mainloop()

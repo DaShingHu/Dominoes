@@ -135,9 +135,14 @@ class Die(object):
                     canvas.create_oval(canvasMaxX - 9, y + 12, canvasMaxX - 3, y + 18, outline = "black", fill = "black")
 
         if self.value >= 8:
+            middleX = (2 * x + 30) / 2
+            middleY = (2 * y + 30) / 2
+            canvas.create_oval(middleX - 3, middleY - 3, middleX + 3, middleY + 3, outline = "black", fill = "black")
+
+
             canvas.create_oval(x + 12, y + 3, x + 18, y + 9, outline = "black", fill = "black")
 
-        if self.value == 9:
+        if self.value >= 9:
             canvas.create_oval(x + 12, canvasMaxY - 9, x + 18, canvasMaxY - 3, outline = "black", fill = "black")
 
                     # if self.value == 8:
