@@ -8,6 +8,13 @@ import random
 import table
 import time
 
+class DominoError(Exception):
+    ### Author: Dustin Hu
+    ### DAte: 12-06-2014
+    ### Purpose: To flag a domino error
+    pass
+        
+
 class DominoGame(object):
     ### Author: Dustin Hu
     ### DAte: 04-06-2014
@@ -131,36 +138,25 @@ class DominoGame(object):
                 self.table.addToTable(self.pHand[self.pHand.findValue(value)], placement)
                 self.pHand.dropDomino(value)
             else:
-                raise NameError("Domino not valid")
+                raise DominoError
         else:
-            placement = placement.upper()
-            ends = self.table.getEnds()
-            leftEnd = str(int(ends[0]))
-            rightEnd = str(int(ends[1]))
-            playable = []
-
-            for domino in self.pHand.dominoes:
-                if int(domino.value) // 10 > 0:
-                    dom = str(domino)
+            leftEnd = int(self.table.getEnds()[0])
+            rightEnd = int(self.table.getEnds()[1])
+            domino = int(self.pHand.dominoes[index].returnValue())
+            if placement == "L":
+                if leftEnd == domino % 10:
+                    self.table.addToTable(self.pHand.dominoes[index], placement)
+                    self.pHand.dropDomino(int(self.pHand.dominoes[index].returnValue()))
                 else:
-                    dom = "0" + str(domino)
-                    
-                if dom[0] == rightEnd:
-                    playable.append((domino, "R"))
-                elif dom[1] == leftEnd:
-                    playable.append((domino, "L"))
-                    
-            print self.pHand
-            print playable
-            print leftEnd, rightEnd
-            print (self.pHand.dominoes[index], placement)
-
-            if (self.pHand.dominoes[index], placement) in playable:
-                self.table.addToTable(self.pHand[index], placement)
-                del self.pHand.dominoes[index]
+                    raise DominoError
             else:
-                raise NameError("Domino not valid")
-                
+                if rightEnd == domino // 10:
+                    self.table.addToTable(self.pHand.dominoes[index], placement)
+                    self.pHand.dropDomino(int(self.pHand.dominoes[index].returnValue()))
+                else:
+                    raise DominoError
+
+                    
                 
             
 
@@ -361,6 +357,7 @@ class DominoGame(object):
         self.c2Hand = hand.Hand(self.genRandHand())
         self.c3Hand = hand.Hand(self.genRandHand())
                 
+
 
         
 #### IGNORE EVERYTHING BELOW THIS POINT 

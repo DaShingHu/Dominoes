@@ -8,6 +8,7 @@ import hand
 import time
 import random
 import tkMessageBox
+import os
 from Tkinter import *
 
 class App(object):
@@ -36,6 +37,8 @@ class App(object):
     ####### playable: Whetehr or not the player can play
 
     ### Methods:
+    ####### showScoe: Shows the score
+    ####### saveScore: Saves scores 
     ####### getCoords: Gets the coordinates of the mouse
     ####### genCoords: Generates the coordinates for the dominoes
     ####### getAbout: Gets the about
@@ -58,6 +61,85 @@ class App(object):
     ####### initRoot: Initalizes the root
     ####### __init__: Initalizes the thing
 
+    def showScore(self):
+        ### Author: Dustin hu
+        ### Date: 15-06-2014
+        ### Purpose: To show the score 
+        ### Input: None
+        ### Output: Non
+        try:
+            path = os.path.dirname(os.path.abspath(__file__))
+            path = path.split("/")
+            path = path[1:-1]
+            data = ""
+            for part in path:
+                data = data + "/" + part
+            data = data + "/save/info.txt"
+            indata = open(data, "r")
+            info = [int(line) for line in indata]
+            indata.close()
+
+        
+            cpu1 = "CPU1: "  + str(info[0])
+            cpu2 = "CPU2: " + str(info[1])
+            cpu3 = "CPU3: " + str(info[2])
+            player = "Player: " + str(info[3])
+            scores = sorted([cpu1, cpu2, cpu3, player], key = lambda word: int(word.split()[-1]), reverse = True)
+            strOut = ""
+
+            for i in xrange(1, len(scores) + 1):
+                strOut = strOut + str(i) + ". " + scores[i - 1] + "\n"
+        
+
+            tkMessageBox.showinfo("Score", strOut)
+
+        except IndexError:
+            path = os.path.dirname(os.path.abspath(__file__))
+            path = path.split("/")
+            path = path[1:-1]
+            data = ""
+            for part in path:
+                data = data + "/" + part
+            data = data + "/save/info.txt"
+            indata = open(data, "w")
+            output = "0\n0\n0\n0\n"
+            indata.write(output)
+            indata.close()
+            self.showScore()
+            
+            
+        
+        
+
+    def saveScore(self, winner, score):
+        ### Author: Dustin Hu
+        ### DAte: 14-06-2014
+        ### Purpose: Saves the score to the scorefile
+        ### Input: None
+        ### Output: None
+        
+        path = os.path.dirname(os.path.abspath(__file__))
+        path = path.split("/")
+        path = path[1:-1]
+        data = ""
+        for part in path:
+            data = data + "/" + part
+        data = data + "/save/info.txt"
+        indata = open(data, "r")
+        info = [str(line) for line in indata]
+        indata.close()
+
+        info[winner] = str(str(int(info[winner]) + score) + "\n")
+        strOutput = ""
+        for line in info:
+            strOutput = strOutput + line
+
+        output = open(data, "w")
+        output.write(strOutput)
+        output.close()
+
+        
+
     def clickMove(self, event):
         ### Author: DUstin Hu
         ### DAte: 13-06-2014
@@ -73,15 +155,11 @@ class App(object):
         rightEnd = int(self.game.table.getEnds()[1])
         domino = int(self.game.pHand.dominoes[self.clickedDomino].returnValue())
 
-        print event.x, event.y
 
         rightDom = self.game.table.getCurrRight(600)
         direction = str(rightDom[-1])
         #### This istop right hand corner of the current domino
         rightDom = (int(rightDom[0]) + 60, int(rightDom[1]))
-        
-        print rightDom
-        print direction
 
         if self.playable == True:
             if int(event.x) >= 100 and int(event.x) <= 160 and int(event.y) >= 130 and int(event.y) <= 160:
@@ -158,13 +236,7 @@ class App(object):
                             tkMessageBox.showinfo("Invalid move", "THat is an invalid move!")
 
                 elif direction == "DL":
-                    print "Hi"
-                    print int(event.x) >= int(rightDom[0] - 120)
-                    print int(event.x) <= int(rightDom[0] + 120)
-                    print int(event.y) >= int(rightDom[1] - 60)
-                    print int(event.y) <= int(rightDom[1] + 60)
                     if int(event.x) >= int(rightDom[0] - 120) and int(event.x) <= int(rightDom[0] + 120) and int(event.y) >= int(rightDom[1] - 60) and int(event.y) <= int(rightDom[1] + 60):
-                        print "In"
                         try:
                             if domino // 10 == rightEnd:
                                 self.game.playerTurn(position = True, index = self.clickedDomino, placement = "R")
@@ -183,14 +255,8 @@ class App(object):
                                 
                                                                                                                                
                         
-                    
-
-                                                                                                                               
-                                                                                                                              
-                                                                                                                              
-                
-                    
-
+        if len(self.game.pHand.dominoes) == 0:
+            self.endGame("Player", self.game.calcScore(self.game.c1Hand, self.game.c2Hand, self.game.c3Hand))
         
 
         
@@ -243,7 +309,7 @@ class App(object):
         ### Purpose: To get help
         ### Input: None
         ### Output: None
-        tkMessageBox.showinfo("Help", "Hit the start game button to start the game.\nType in the domino number that you wish to play, counting from 0 at the far left of your hand and select which end of the chain you want to play it on (If the chain has turned, the lower one is the right). Hit the play button to play it, and the End Turn button to end your turn. However, if it's possible for you to play a domino, the End Turn button will not be enabled until you've played a card!")
+        tkMessageBox.showinfo("Help", "Hit the start game button to start the game.\nType in the domino number that you wish to play, counting from 0 at the far left of your hand and select which end of the chain you want to play it on (If the chain has turned, the lower one is the right). Hit the play button to play it, and the End Turn button to end your turn. However, if it's possible for you to play a domino, the End Turn button will not be enabled until you've played a card!\nAlternatively, you can click on the domino that you wish to play and where to play it to play it.")
 
 
     def checkPlayable(self):
@@ -295,6 +361,19 @@ class App(object):
         ### Output: None
         tkMessageBox.showinfo("Game Over!", "Congratulations, %s won, with a score of %i!" %( playerName, score))
         self.playable = False
+        player = 0
+        if playerName == "Computer 1":
+            player = 0
+        elif playerName == "Computer 2":
+            player = 1
+        elif playerName == "Computer 3":
+            player = 2
+        elif playerName == "Player":
+            player = 3
+
+            
+        self.saveScore(player, score)
+        
 
         
 
@@ -649,6 +728,7 @@ class App(object):
         self.helpMenu = Menu(self.menubar, tearoff = 0)
         self.helpMenu.add_command(label = "Help", command = lambda:self.getHelp())
         self.helpMenu.add_command(label = "About", command = lambda:self.getAbout())
+        self.helpMenu.add_command(label = "Scores", command = lambda:self.showScore())
 
         self.menubar.add_cascade(label = "Help", menu = self.helpMenu)
 

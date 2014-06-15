@@ -17,6 +17,7 @@ class Table(object):
     ####### rightEnd: THe rightmost domion's value
 
     ### MethodS:
+    ####### getCurrRight: Gets the current right x, y
     ####### checkInnerValid: Checks the validity of the list itself
     ####### drawTable: Draws the table, given the size of the canvas.
     ####### __str__: Returns the table and size
@@ -25,6 +26,43 @@ class Table(object):
     ####### update: Updates the table
     ####### addToTable: Adds a domino to the table
     ####### __init__: THe initalization method  of the table class
+
+    def getCurrRight(self, size):
+        ### Author: DUsitn Hu
+        ### Date: 13-06-2014
+        ### Purpose: To get the coordinates of th ecurrent right end of the chain
+        ### Input: Size, canvas#
+        ### OUtput: tuple containing x, y, and a direction
+
+        ### Jujst drawTable with displays removed.
+        endX = size - 60
+        startX = 130
+        direction = "R"
+        currX = 130
+        currY = 130
+        for i in xrange(0, len(self.table)):
+            if direction == "R":
+                currX = currX + 60
+                if currX >= endX:
+                    direction = "DR"
+                    currX= currX - 30
+                    currY = currY + 30
+            elif direction == "DR":
+                currY = currY + 30
+                currX =  currX - 60
+                direction = "L"
+            elif direction == "L":
+                currX = currX - 60
+                if currX <= startX:
+                    currY = currY + 30
+                    currX = currX - 60
+                    direction = "DL"
+            elif direction == "DL":
+                currY = currY - 30
+                currX = currX + 90
+                currY = currY + 60
+                direction = "R"
+        return (currX, currY, direction)
 
 
     def checkInnerValid(self):
@@ -49,10 +87,14 @@ class Table(object):
         ### Input: The size of the canvas to draw to and a canvas to draw to
         ### Output: None
         endX = size - 60
-        startX = 30
+        startX = 130
         direction = "R"
-        currX = 30
-        currY = 30
+        currX = 130
+        currY = 130
+        # startX = 30
+        # direction = "R"
+        # currX = 30
+        # currY = 30
         for i in xrange(0, len(self.table)):
             if direction == "R":
                 self.table[i].displayValue(canvas, currX, currY, orientation = "H")
