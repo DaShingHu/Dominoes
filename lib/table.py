@@ -149,7 +149,7 @@ class Table(object):
         ### Output: Boolean true or false
         valid = True
 #        print "In check valid"
-        if str(domino.returnValue()) != "66":
+        if str(domino.returnValue()) != "99":
             if placement == "L":
                 # print "Placement = \"L\""
                 # print str(domino.returnValue())[1], self.leftEnd

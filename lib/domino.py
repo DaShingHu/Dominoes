@@ -130,9 +130,9 @@ class Domino(object):
         ### Purpose: To set the values of the dice
         ### INput: Two integers in the range of 0 to 6.
         ### Output: None
-        if d1 >= 0 and 6 >= d1:
+        if d1 >= 0 and 9 >= d1:
             self.lstDice[0].setValue(d1)
-        if d2 >= 0 and 6 >= d2:
+        if d2 >= 0 and 9 >= d2:
             self.lstDice[1].setValue(d2)
         self.updateValue()
         

@@ -112,19 +112,19 @@ class Hand(object):
         if faceup == True:
             if orientation == "V":
                 for i in xrange(0, len(self.dominoes)):
-                    self.dominoes[i].displayValue(canvas, x = x, y = ( i + 1) * 2 * (self.size + 10), orientation = "V")
+                    self.dominoes[i].displayValue(canvas, x = x, y = y + ( i + 1) *  (self.size + 5 ), orientation = "H")
             
 
             else:
                 for i in xrange(0, len(self.dominoes)):
-                    self.dominoes[i].displayValue(canvas, x = (i + 1) * 2 * (self.size + 10), y = y, orientation = "H")
+                    self.dominoes[i].displayValue(canvas, x = x + (i + 1) *  (self.size + 5), y = y, orientation = "V")
         else:
             if orientation == "V":
                 for i in xrange(0, len(self.dominoes)):
-                    self.drawRectangle(canvas, x, ((i + 1) * 2 * (self.size + 10)), orientation = "V")
+                    self.drawRectangle(canvas, x, y + (i + 1)  * (self.size + 5), orientation = "H")
             else:
                 for i in xrange(0, len(self.dominoes)):
-                    self.drawRectangle(canvas, ((i + 1) * 2 * (self.size + 10)), y , orientation = "H")
+                    self.drawRectangle(canvas, x + (i + 1) *  (self.size + 5 ), y , orientation = "V")
 
 
     def addDomino(self, domino):

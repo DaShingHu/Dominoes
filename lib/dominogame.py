@@ -7,6 +7,7 @@ import hand
 import random
 import table
 import time
+import collections
 
 class DominoError(Exception):
     ### Author: Dustin Hu
@@ -167,20 +168,10 @@ class DominoGame(object):
         ### Purpose: TO star the game
         ### Input: None
         ### Output: None
-        if 66 in self.pHand:
-            self.table.addToTable(self.pHand[self.pHand.findValue(66)])
-            self.pHand.dropDomino(66)
-        elif 66 in self.c1Hand:
-            self.table.addToTable(self.c1Hand[self.c1Hand.findValue(66)])
-            self.c1Hand.dropDomino(66)
-        elif 66 in self.c2Hand:
-            self.table.addToTable(self.c2Hand[self.c2Hand.findValue(66)])
-            self.c2Hand.dropDomino(66)
-        else:
-            self.table.addToTable(self.c3Hand[self.c3Hand.findValue(66)])
-            self.c3Hand.dropDomino(66)
-            
-
+        startDomino = domino.Domino()
+        startDomino.setValue(9, 9)
+        self.table.addToTable(startDomino)
+        
 
         # if self.pHand.findValue(66) != -1:
         #     self.table.addToTable(self.pHand[self.pHand.findValue(66)])
@@ -314,22 +305,28 @@ class DominoGame(object):
         ### Input: None
         ### Output: A list of dominoes
         values = []
-        while len(values) != 7:
-            i = 19
-            while (i % 10 <= 6 ) == False:
-                i = random.randint(0, 66)
+        while len(values) != 14:
+            i = random.randint(0, 99)
             if self.available[i] == True:
-                if str(i)[0] <= str(i)[-1]:
-                    self.available[i] = False
-                    c = i
-                    if c <= 9:
-                        c = "0" + str(c)
-                    else:
-                        c = str(c)
-                    tempDomino = domino.Domino()
-                    tempDomino.setValue(int(c[0]), int(c[1]))
-                    values.append(tempDomino)
+                tempDomino = domino.Domino()
+                tempDomino.setValue(i // 10, i % 10)
+                values.append(tempDomino)
         return values
+        #     i = 19
+        #     while (i % 10 <= 6 ) == False:
+        #         i = random.randint(0, 66)
+        #     if self.available[i] == True:
+        #         if str(i)[0] <= str(i)[-1]:
+        #             self.available[i] = False
+        #             c = i
+        #             if c <= 9:
+        #                 c = "0" + str(c)
+        #             else:
+        #                 c = str(c)
+        #             tempDomino = domino.Domino()
+        #             tempDomino.setValue(int(c[0]), int(c[1]))
+        #             values.append(tempDomino)
+        # return values
                     
 
     def __init__(self):
@@ -341,16 +338,13 @@ class DominoGame(object):
         self.available = []
 
         ### Creates the available cards
-        for i in xrange(0, 67):
-            ### Ensures that both digits are below 6
-            if i % 10 <= 6:
-                ### Ensures that you don't get something like 13 and 31, becaues 1st digit will always be <= second digit.
-                if str(i)[0] <= str(i)[-1]:
-                    self.available.append(True)
-                else:
-                    self.available.append(False)
+        for i in xrange(0, 100):
+            if i % 10 >= i // 10:
+                self.available.append(True)
             else:
                 self.available.append(False)
+
+
         self.table = table.Table()
         self.pHand = hand.Hand(self.genRandHand())
         self.c1Hand = hand.Hand(self.genRandHand())

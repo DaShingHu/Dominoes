@@ -33,7 +33,7 @@ class Die(object):
             self.size = 50
         self.radius = self.size / 9
         self.gap = self.size  / 10
-        self.value = random.randint(0, 6)
+        self.value = random.randint(0, 9)
             
     def __str__(self):
         ### Author: Dustin Hu
@@ -56,7 +56,7 @@ class Die(object):
             intInput = raw_input("Please enter a valid integere between 1 and 6.\n>")
             if intInput.isdigit() == True:
                 intInput = int(intInput)
-                if intInput >= 0 and intInput <= 6:
+                if intInput >= 0 and intInput <= 9:
                     self.value = intInput
                     blnExit = True
         
@@ -67,7 +67,7 @@ class Die(object):
         ### Input: THe data elements within the object
         ### Output: The modified data element
         
-        if value >= 0 and value <= 6:
+        if value >= 0 and value <= 9:
             self.value = value
         else:
             self.value = 0
@@ -84,7 +84,7 @@ class Die(object):
             self.gap = self.radius / 2
         else:
             self.size = 50
-            self.radius = self.size / 5
+            self.radius = self.size / 8
             self.gap = self.radius / 2
 
     def roll(self):
@@ -93,7 +93,7 @@ class Die(object):
         ### Purpose: To roll the die object, to change the value
         ### Input: THe data elements within the object
         ### Output: A modified data element
-        self.value = random.randint(0, 6)
+        self.value = random.randint(0, 9)
 
 
 
@@ -111,26 +111,83 @@ class Die(object):
         
         canvas.create_rectangle(x, y, x + self.size, y + self.size, width = 1, outline = "black", fill = "white")
 
+
+
+
         if self.value % 2 == 1:
             #### Middle x and y are treated as being the average of all 4 points of the square that is, (2x + self.size) / 2, and the same with the y.
-            middleX = (x + x + self.size) / 2
-            middleY = (y + y + self.size) / 2
-            canvas.create_oval(middleX - self.radius, middleY - self.radius, middleX + self.radius, middleY + self.radius, width = 1, outline = "black", fill = "black")
-            
-        if self.value >= 2:
-            ### Draw circles at top left and bottom right coordinates
-            canvas.create_oval(x + self.gap, y + self.gap, x + self.gap + 2 * self.radius, y + self.gap + 2 * self.radius, width = 1, outline = "black", fill = "black")
-            canvas.create_oval(canvasMaxX - self.gap - 2 * self.radius, canvasMaxY - self.gap - 2 * self.radius, canvasMaxX - self.gap, canvasMaxY - self.gap, width = 1, outline = "black", fill = "black")
-            
-            if self.value >= 4:
-                canvas.create_oval(x + self.gap, canvasMaxY - self.gap - 2 * self.radius, x + self.gap + 2 * self.radius, canvasMaxY - self.gap, width = 1, outline = "black", fill = "black")
-                canvas.create_oval(canvasMaxX - self.gap - 2 * self.radius, y + self.gap, canvasMaxX - self.gap, y + self.gap + 2 * self.radius, width = 1, outline = "black", fill = "black")
+            middleX = (2 * x + 30) / 2
+            middleY = (2 * y + 30) / 2
+            canvas.create_oval(middleX - 3, middleY - 3, middleX + 3, middleY + 3, outline = "black", fill = "black")
 
-                if self.value == 6:
-                    ### Centers of top and bottom circles
-                    circleMidY = (y + self.gap + canvasMaxY - self.gap) / 2
-                    canvas.create_oval(x + self.gap, circleMidY - self.radius, x + self.gap + 2 * self.radius, circleMidY + self.radius, width =1, outline = "black", fill = "black")
-                    canvas.create_oval(canvasMaxX - self.gap, circleMidY - self.radius, canvasMaxX - 2 * self.radius - self.gap, circleMidY + self.radius, width = 1, outline = "black", fill = "black")
+        if self.value >= 2:
+            ### Draw circles at top left and bottom right
+            canvas.create_oval(x + 3, y + 3, x + 9, y + 9, outline = "black", fill = "black")
+            canvas.create_oval(canvasMaxX - 9, canvasMaxY - 9, canvasMaxX - 3, canvasMaxY - 3, outline = "black", fill = "black")
+            if self.value >= 4:
+                #### DRaws circles at bottom left and top right
+                canvas.create_oval(x + 3, canvasMaxY - 9, x + 9, canvasMaxY - 3, outline = "black", fill = "black")
+                canvas.create_oval(canvasMaxX - 9, y + 3, canvasMaxX - 3, y + 9, outline = "black", fill = "black")
+
+                if self.value >= 6:
+                    ### DRaws circles in the middle fo the sides
+                    canvas.create_oval(x + 3, y + 12, x + 9, y + 18, outline = "black", fill = "black")
+                    canvas.create_oval(canvasMaxX - 9, y + 12, canvasMaxX - 3, y + 18, outline = "black", fill = "black")
+
+        if self.value >= 8:
+            canvas.create_oval(x + 12, y + 3, x + 18, y + 9, outline = "black", fill = "black")
+
+        if self.value == 9:
+            canvas.create_oval(x + 12, canvasMaxY - 9, x + 18, canvasMaxY - 3, outline = "black", fill = "black")
+
+                    # if self.value == 8:
+                    #     ### Draws circel at the very top centre
+                    #     canvas.create_oval(x + 12, y + 3, x + 18, y + 9, outline = "black", fill = "black")
+
+                    #     if self.value == 9:
+                    #         ### Draw circle at the very bottom centre
+                    #         canvas.create_oval(x + 12, canvasMaxY - 9, x + 18, canvasMaxY - 3, outline = "black", fill = "black"
+                            
+                            
+
+                        
+
+            
+
+
+        # if self.value >= 2:
+        #     ### Draw circles at top left and bottom right
+        #     canvas.create_oval(x + 5, y + 5, x + 15, y + 15, width = 1, outline = "black", fill = "black")
+        #     canvas.create_oval(canvasMaxX - 5, canvasMaxY - 5, canvasMaxX - 15, canvasMaxY - 15, width = 1, outline = "black", fill = "black")
+
+        #     if self.value >= 4:
+        #         canvas.create_oval(canvasMaxX - 15, y + 5, canvasMaxX - 5, y + 30, width = 1, outline = "black", fill = "black")
+        #         canvas.create_oval(x + 5, canvasMaxY - 15, x + 15, canvasMaxY - 5, width = 1, outline = "black", fill = "black")
+
+
+        #         if self.value >= 6:
+        #             canvas.create_oval(x + 5, y + 20, x + 15, y + 30, width = 1, outline = "black", fill = "black")
+        #             canvas.create_oval(canvasMaxX - 15, y + 20, canvasMaxX - 5, y + 30, width = 1, outline = "black", fill = "black")
+    
+
+            
+        
+        
+            
+        # if self.value >= 2:
+        #     ### Draw circles at top left and bottom right coordinates
+        #     canvas.create_oval(x + self.gap, y + self.gap, x + self.gap + 2 * self.radius, y + self.gap + 2 * self.radius, width = 1, outline = "black", fill = "black")
+        #     canvas.create_oval(canvasMaxX - self.gap - 2 * self.radius, canvasMaxY - self.gap - 2 * self.radius, canvasMaxX - self.gap, canvasMaxY - self.gap, width = 1, outline = "black", fill = "black")
+            
+        #     if self.value >= 4:
+        #         canvas.create_oval(x + self.gap, canvasMaxY - self.gap - 2 * self.radius, x + self.gap + 2 * self.radius, canvasMaxY - self.gap, width = 1, outline = "black", fill = "black")
+        #         canvas.create_oval(canvasMaxX - self.gap - 2 * self.radius, y + self.gap, canvasMaxX - self.gap, y + self.gap + 2 * self.radius, width = 1, outline = "black", fill = "black")
+
+        #         if self.value == 6:
+        #             ### Centers of top and bottom circles
+        #             circleMidY = (y + self.gap + canvasMaxY - self.gap) / 2
+        #             canvas.create_oval(x + self.gap, circleMidY - self.radius, x + self.gap + 2 * self.radius, circleMidY + self.radius, width =1, outline = "black", fill = "black")
+        #             canvas.create_oval(canvasMaxX - self.gap, circleMidY - self.radius, canvasMaxX - 2 * self.radius - self.gap, circleMidY + self.radius, width = 1, outline = "black", fill = "black")
             
 
 
